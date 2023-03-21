@@ -1,3 +1,4 @@
+const { ObjectId } = require('mongoose').Types;
 const User = require('../models/user');
 
 module.exports = {
@@ -30,5 +31,17 @@ module.exports = {
                 : res.json(user)
         )
         .catch((err) => res.status(500).json(err));
+  },
+  deleteUser(req, res) {
+    User.findOneAndRemove({ _id: req.params.userId })
+      .then((user) =>
+        !user
+          ? res.status(404).json({ message: 'No such User exists' })
+          : res.json(user)
+      )
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json(err);
+      });
   },
 };
