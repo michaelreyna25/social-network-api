@@ -1,5 +1,5 @@
 const { ObjectId } = require('mongoose').Types;
-const User = require('../models/user');
+const { User } = require('../models');
 
 module.exports = {
   getUsers(req, res) {
@@ -22,15 +22,15 @@ module.exports = {
       .catch((err) => res.status(500).json(err));
   },
   updateUser(req, res) {
-    User.findOneAndUpdate({_id: req.params.userId})
-        .then((user) =>
-            !user 
-                ? res
-                    .status(200)
-                    .json({ message: 'User connot be updated or found' })
-                : res.json(user)
-        )
-        .catch((err) => res.status(500).json(err));
+    User.findOneAndUpdate({ _id: req.params.userId })
+      .then((user) =>
+        !user
+          ? res
+            .status(200)
+            .json({ message: 'User connot be updated or found' })
+          : res.json(user)
+      )
+      .catch((err) => res.status(500).json(err));
   },
   deleteUser(req, res) {
     User.findOneAndRemove({ _id: req.params.userId })
@@ -44,4 +44,6 @@ module.exports = {
         res.status(500).json(err);
       });
   },
+
+
 };
