@@ -1,5 +1,6 @@
 const { ObjectId } = require('mongoose').Types;
-const { Thoughts, reactionSchema } = require('../models');
+const { Thoughts, User } = require('../models');
+
 
 
 module.exports = {
@@ -10,10 +11,13 @@ module.exports = {
     },
     getSingleThought(req, res) {
         Thoughts.findOne({ _id: req.params.ThoughtsId })
-            .then((thought) =>
+            .then(async (thought) =>
                 !thought
                     ? res.status(404).json({ message: 'No Thoughts with that ID' })
-                    : res.json(thought)
+                    : res.json({ 
+                        thought,
+                        user: await user(req.params.userId)
+                    })
             )
             .catch((err) => res.status(500).json(err));
     },
@@ -45,11 +49,5 @@ module.exports = {
                 console.log(err);
                 res.status(500).json(err);
             });
-    },
-    updateReaction(req, res){
-        reactionSchema.findOneAndUpdate()
-    },
-    deleteReaction(req, res){
-
     },
 }

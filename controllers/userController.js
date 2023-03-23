@@ -1,5 +1,11 @@
 const { ObjectId } = require('mongoose').Types;
-const { User } = require('../models');
+const { User, Thoughts } = require('../models');
+
+const friendCount = async () =>
+  User.aggregate()
+    .count('friendCount')
+    .then((numberOfFriends) => numberOfFriends);
+
 
 module.exports = {
   getUsers(req, res) {
@@ -37,7 +43,7 @@ module.exports = {
       .then((user) =>
         !user
           ? res.status(404).json({ message: 'No such User exists' })
-          : res.json(user)
+          : Thoughts.deleteMany({ _id: { $in: user.thoughts } })
       )
       .catch((err) => {
         console.log(err);
@@ -46,4 +52,34 @@ module.exports = {
   },
 
 
+  addFriend(req, res) {
+    User.findOneAndUpdate(
+      { _id: req.params.userId },
+      { $addToSet: { friends: { friendsId: req.params.friendsId } } },
+      { runValidators: true, new: true }
+    )
+      .then((user) =>
+        !user
+          ? res
+            .status(404)
+            .json({ message: 'Invalid user' })
+          : res.json(user)
+      )
+      .catch((err) => res.status(500).json(err));
+  },
+  removeFriend(req, res) {
+    User.findOneAndUpdate(
+      { _id: req.params.userId },
+      { $pull: { friends: { friendsId: req.params.friendsId } } },
+      { runValidators: true, new: true }
+    )
+      .then((user) =>
+        !user
+          ? res
+            .status(404)
+            .json({ message: 'No user found with that ID :(' })
+          : res.json(user)
+      )
+      .catch((err) => res.status(500).json(err));
+  },
 };
