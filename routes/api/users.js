@@ -20,7 +20,7 @@ router
 
 router
     .route('/:userId/friends')
-    .put(addFriend);
+    .post(addFriend);
 
 router
     .route('/:userId/friends/:friendId')

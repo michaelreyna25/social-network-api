@@ -1,5 +1,5 @@
 const { ObjectId } = require('mongoose').Types;
-const { Thoughts, User } = require('../models');
+const { Thoughts } = require('../models');
 
 
 
@@ -14,7 +14,7 @@ module.exports = {
             .then(async (thought) =>
                 !thought
                     ? res.status(404).json({ message: 'No Thoughts with that ID' })
-                    : res.json({ 
+                    : res.json({
                         thought,
                         user: await user(req.params.userId)
                     })
@@ -50,4 +50,35 @@ module.exports = {
                 res.status(500).json(err);
             });
     },
+    addReaction(req, res) {
+        Thoughts.findOneAndUpdate(
+            { _id: req.params.thoughtId },
+            { $addToSet: { reactions: req.body } },
+            { runValidators: true, new: true }
+        )
+            .then((thought) =>
+                !thought
+                    ? res.status(404).json({ message: 'cannot find id' })
+                    : res.json(thought)
+            )
+            .catch((err) => res.status(500).json(err));
+
+    },
+
+
+    removeReaction(req, res) {
+        Thoughts.findOneAndUpdate(
+          { _id: req.params.thoughtId },
+          { $pull: { reaction: { reactionId: req.params.reactionId } } },
+          { runValidators: true, new: true }
+        )
+          .then((thought) =>
+            !thought
+              ? res
+                  .status(404)
+                  .json({ message: 'No thought found with that ID :(' })
+              : res.json(thought)
+          )
+          .catch((err) => res.status(500).json(err));
+      },
 }
