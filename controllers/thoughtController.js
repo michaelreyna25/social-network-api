@@ -1,8 +1,6 @@
 const { ObjectId } = require('mongoose').Types;
 const { Thoughts } = require('../models');
 
-
-
 module.exports = {
     getThoughts(req, res) {
         Thoughts.find()
